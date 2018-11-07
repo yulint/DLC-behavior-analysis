@@ -105,34 +105,34 @@ male_right_ear_interpolated_lfilt_y = lfilter(nom,denom,male_right_ear_interpola
 male_left_ear_interpolated_lfilt_x = lfilter(nom,denom,male_left_ear_interpolated_x)
 male_left_ear_interpolated_lfilt_y = lfilter(nom,denom,male_left_ear_interpolated_y)
 
-np.save('female_nose_interpolated_lfilt_x', female_nose_interpolated_lfilt_x)
-np.save('female_nose_interpolated_lfilt_y', female_nose_interpolated_lfilt_y)
+np.save('data/female_nose_interpolated_lfilt_x', female_nose_interpolated_lfilt_x)
+np.save('data/female_nose_interpolated_lfilt_y', female_nose_interpolated_lfilt_y)
 
-np.save('female_tail_interpolated_lfilt_x', female_tail_interpolated_lfilt_x)
-np.save('female_tail_interpolated_lfilt_y', female_tail_interpolated_lfilt_y)
+np.save('data/female_tail_interpolated_lfilt_x', female_tail_interpolated_lfilt_x)
+np.save('data/female_tail_interpolated_lfilt_y', female_tail_interpolated_lfilt_y)
 
-np.save('female_right_ear_interpolated_lfilt_x', female_right_ear_interpolated_lfilt_x)
-np.save('female_right_ear_interpolated_lfilt_y', female_right_ear_interpolated_lfilt_y)
+np.save('data/female_right_ear_interpolated_lfilt_x', female_right_ear_interpolated_lfilt_x)
+np.save('data/female_right_ear_interpolated_lfilt_y', female_right_ear_interpolated_lfilt_y)
 
-np.save('female_left_ear_interpolated_lfilt_x', female_left_ear_interpolated_lfilt_x)
-np.save('female_left_ear_interpolated_lfilt_y', female_left_ear_interpolated_lfilt_y)
+np.save('data/female_left_ear_interpolated_lfilt_x', female_left_ear_interpolated_lfilt_x)
+np.save('data/female_left_ear_interpolated_lfilt_y', female_left_ear_interpolated_lfilt_y)
 
-np.save('female_tail_interpolated_lfilt_x', female_tail_interpolated_lfilt_x)
-np.save('female_tail_interpolated_lfilt_y', female_tail_interpolated_lfilt_y)
+np.save('data/female_tail_interpolated_lfilt_x', female_tail_interpolated_lfilt_x)
+np.save('data/female_tail_interpolated_lfilt_y', female_tail_interpolated_lfilt_y)
 
-np.save('male_nose_interpolated_lfilt_x', male_nose_interpolated_lfilt_x)
-np.save('male_nose_interpolated_lfilt_y', male_nose_interpolated_lfilt_y)
+np.save('data/male_nose_interpolated_lfilt_x', male_nose_interpolated_lfilt_x)
+np.save('data/male_nose_interpolated_lfilt_y', male_nose_interpolated_lfilt_y)
 
-np.save('male_tail_interpolated_lfilt_x', male_tail_interpolated_lfilt_x)
-np.save('male_tail_interpolated_lfilt_y', male_tail_interpolated_lfilt_y)
+np.save('data/male_tail_interpolated_lfilt_x', male_tail_interpolated_lfilt_x)
+np.save('data/male_tail_interpolated_lfilt_y', male_tail_interpolated_lfilt_y)
 
-np.save('male_right_ear_interpolated_lfilt_x', male_right_ear_interpolated_lfilt_x)
-np.save('male_right_ear_interpolated_lfilt_y', male_right_ear_interpolated_lfilt_y)
+np.save('data/male_right_ear_interpolated_lfilt_x', male_right_ear_interpolated_lfilt_x)
+np.save('data/male_right_ear_interpolated_lfilt_y', male_right_ear_interpolated_lfilt_y)
 
-np.save('male_left_ear_interpolated_lfilt_x', male_left_ear_interpolated_lfilt_x)
-np.save('male_left_ear_interpolated_lfilt_y', male_left_ear_interpolated_lfilt_y)
+np.save('data/male_left_ear_interpolated_lfilt_x', male_left_ear_interpolated_lfilt_x)
+np.save('data/male_left_ear_interpolated_lfilt_y', male_left_ear_interpolated_lfilt_y)
 
-np.save('male_tail_interpolated_lfilt_x', male_tail_interpolated_lfilt_x)
-np.save('male_tail_interpolated_lfilt_y', male_tail_interpolated_lfilt_y)
+np.save('data/male_tail_interpolated_lfilt_x', male_tail_interpolated_lfilt_x)
+np.save('data/male_tail_interpolated_lfilt_y', male_tail_interpolated_lfilt_y)
 
 

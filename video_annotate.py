@@ -54,9 +54,8 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type):
 	cap.release()
 	out.release()
 
-if __name__ == '__main__':
-
-	# # test filter
+def main():
+		# # test filter
 	# binary_vector = np.zeros(10)
 	# binary_vector[2:5] = [1,1,1]
 	# print('raw vector: ',binary_vector)
@@ -77,4 +76,7 @@ if __name__ == '__main__':
 	behaviour_type = 'attacking'
 
 	annotate_video(video_file,"../mouse_annotated.avi",binary_vector,behaviour_type)
+
+if __name__ == '__main__':
+	main()
 

@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import animation, rc
-from IPython.display import HTML
 import time
 from scipy.signal import lfilter
 
@@ -12,35 +11,35 @@ from sklearn.manifold import TSNE
 
 from ethogram_analysis_code import zip_xy, find_distance, sniffing_threshold, theta_btwn_vectors, target_theta, orienting_threshold, combined_nosetail_orienting_threshold, cross_corr_xy, following_threshold, movement
 
-female_nose_interpolated_lfilt_x = np.load('female_nose_interpolated_lfilt_x.npz')
-female_nose_interpolated_lfilt_y = np.load('female_nose_interpolated_lfilt_y.npz')
+female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
+female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
 
-female_tail_interpolated_lfilt_x = np.load('female_tail_interpolated_lfilt_x.npz')
-female_tail_interpolated_lfilt_y = np.load('female_tail_interpolated_lfilt_y.npz')
+female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
 
-female_right_ear_interpolated_lfilt_x = np.load('female_right_ear_interpolated_lfilt_x.npz')
-female_right_ear_interpolated_lfilt_y = np.load('female_right_ear_interpolated_lfilt_y.npz')
+female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
+female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
 
-female_left_ear_interpolated_lfilt_x = np.load('female_left_ear_interpolated_lfilt_x.npz')
-female_left_ear_interpolated_lfilt_y = np.load('female_left_ear_interpolated_lfilt_y.npz')
+female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
+female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
 
-female_tail_interpolated_lfilt_x = np.load('female_tail_interpolated_lfilt_x.npz')
-female_tail_interpolated_lfilt_y = np.load('female_tail_interpolated_lfilt_y.npz')
+female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
 
-male_nose_interpolated_lfilt_x = np.load('male_nose_interpolated_lfilt_x.npz')
-male_nose_interpolated_lfilt_y = np.load('male_nose_interpolated_lfilt_y.npz')
+male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
+male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
 
-male_tail_interpolated_lfilt_x = np.load('male_tail_interpolated_lfilt_x.npz')
-male_tail_interpolated_lfilt_y = np.load('male_tail_interpolated_lfilt_y.npz')
+male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
-male_right_ear_interpolated_lfilt_x = np.load('male_right_ear_interpolated_lfilt_x.npz')
-male_right_ear_interpolated_lfilt_y= np.load('male_right_ear_interpolated_lfilt_y.npz')
+male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
+male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
 
-male_left_ear_interpolated_lfilt_x = np.load('male_left_ear_interpolated_lfilt_x.npz')
-male_left_ear_interpolated_lfilt_y = np.load('male_left_ear_interpolated_lfilt_y.npz')
+male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
+male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
 
-male_tail_interpolated_lfilt_x = np.load('male_tail_interpolated_lfilt_x.npz')
-male_tail_interpolated_lfilt_y = np.load('male_tail_interpolated_lfilt_y.npz')
+male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
 
 ##################################################################################################################
@@ -145,13 +144,47 @@ ax1.plot(sexual_pursuit)
 ax1.set_title("sexual_pursuit")
 
 #################################
-behav_metrics = np.stack((nose_nose_dist, male_nose_female_tail_dist, male_nose_female_body_dist, female_nose_male_tail_dist, female_nose_male_body_dist, \
-                          female_theta_to_male_nose, female_theta_to_male_tail, female_head_dir_vector, \
-                          male_theta_to_female_nose, male_head_to_female_nose_vector, male_head_dir_vector, \
-                          male_movement.append(0),male_movement.append(0)), axis =-1)    
+
+male_movement = np.array(male_movement)
+female_movement = np.array(female_movement)
+
+# only 2D lists, could be recursive for each dimension
+def pad_zeros(unpadded, shape):	
+	result = np.zeros(shape)
+	result[:unpadded.shape[0],:unpadded.shape[1]] = unpadded
+	return result
+shape = (len(nose_nose_dist),2)
+female_movement = pad_zeros(female_movement, shape)
+male_movement = pad_zeros(male_movement, shape)
+
+behav_metrics = np.array([
+	nose_nose_dist, 
+	male_nose_female_tail_dist, 
+	male_nose_female_body_dist, 
+	female_nose_male_tail_dist, 
+	female_nose_male_body_dist,
+	female_theta_to_male_nose, 
+	female_theta_to_male_tail, 
+	female_head_dir_vector[:,0],
+	female_head_dir_vector[:,1],
+	male_theta_to_female_nose, 
+	male_head_to_female_nose_vector[:,0], 
+	male_head_dir_vector[:,0],
+	male_movement[:,0],
+	female_movement[:,0],
+	male_head_to_female_nose_vector[:,1], 
+	male_head_dir_vector[:,1],
+	male_movement[:,1],
+	female_movement[:,1]
+	])    
+
+# for idx, elem in enumerate(behav_metrics):
+# 	if type(elem) is not 'numpy.ndarray':
+# 		behav_metrics[idx] = np.array(elem)
+# 	print(behav_metrics[idx].shape)
 
 tsne = TSNE(n_components=2).fit_transform(behav_metrics)
-
 plt.figure(figsize=(12,8))
 plt.title('t-SNE components')
 plt.scatter(tsne[:,0], tsne[:,1])
+plt.show()
