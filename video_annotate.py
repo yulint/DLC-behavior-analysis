@@ -29,7 +29,7 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type):
 	cap = cv2.VideoCapture(filename_in)
 	frame_width = int(cap.get(3))
 	frame_height = int(cap.get(4))
-	framerate = 35
+	framerate = 30
 	fourcc = cv2.VideoWriter_fourcc(*"XVID")
 	out = cv2.VideoWriter(filename_out, fourcc, framerate, (frame_width,frame_height))    
 
@@ -55,6 +55,7 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type):
 	out.release()
 
 if __name__ == '__main__':
+
 	# # test filter
 	# binary_vector = np.zeros(10)
 	# binary_vector[2:5] = [1,1,1]
@@ -69,7 +70,7 @@ if __name__ == '__main__':
 	print(num_frames)
 
 	# filter out lonely 1's 	
-	prob_0 = .3
+	prob_0 = .1
 	binary_vector = np.random.choice([0, 1], size=(num_frames,), p=[prob_0, 1-prob_0])
 	binary_vector = filter_binary(binary_vector, 13)
 

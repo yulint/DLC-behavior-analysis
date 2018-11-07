@@ -6,7 +6,7 @@ import seaborn as sns
 from matplotlib import animation, rc
 from IPython.display import HTML
 import time
-from scipy.signal import lfilter
+from scipy.signal import filtfilt, butter, lfilter
 
 from edit_data import  get_x_y_data_cleanup, start_value_cleanup, interp_0_coords
 from ethogram_analysis_code import zip_xy, find_distance, sniffing_threshold, theta_btwn_vectors, target_theta, orienting_threshold, combined_nosetail_orienting_threshold, cross_corr_xy, following_threshold, movement
@@ -78,10 +78,7 @@ female_left_ear_interpolated_x = interp_0_coords(female_left_ear_0s_x)
 female_left_ear_interpolated_y = interp_0_coords(female_left_ear_0s_y)
 
 #### linear filter on coords 
-n= 20 # the larger n is, the smoother curve will be
-
-nom = [1.0 / n] * n
-denom = 1
+`
 
 female_nose_interpolated_lfilt_x = lfilter(nom,denom,female_nose_interpolated_x)
 female_nose_interpolated_lfilt_y = lfilter(nom,denom,female_nose_interpolated_y)

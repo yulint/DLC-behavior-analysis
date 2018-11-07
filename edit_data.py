@@ -99,6 +99,17 @@ def interp_0_coords(coords_list):
     print('function exiting')
     return(coords_list)
 
+def apply_filter(b,a,vec)
+    nom = [1.0 / 20] * 20
+    denom = 1
+    if filter_type is 'linear':
+        outupt = lfilter(nom,denom,vec)
+
+    if filter_type is 'butter':
+        b, a = butter(6, 0.1)
+        output = filtfilt(b, a, vec)
+
+    return output
 
 def plot_x_y_coords(x_coords, y_coords, start, end, n_data_plotted, data_index): 
     
