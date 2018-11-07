@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def zip_xy(x_pos, y_pos):
     
@@ -51,7 +51,7 @@ def target_theta(nose_xy, left_ear_xy, right_ear_xy, target_xy):
     
     theta_to_target = theta_btwn_vectors(head_dir_vector,ear_mid_pt_to_target_vector)
         
-    return theta_to_target, ear_mid_pt_to_target_vector
+    return theta_to_target, ear_mid_pt_to_target_vector, head_dir_vector
 
 def orienting_threshold(theta_to_target,threshold = np.pi/12):
     #threshold theta to individual body parts (nose/tail)
@@ -132,4 +132,5 @@ def movement(xy, time_scale=35):
         movement_direction.append(unit_vector)
     
     return movement_vector, movement_velocity, movement_direction
+
 

@@ -125,91 +125,93 @@ def plot_x_y_coords(x_coords, y_coords, start, end, n_data_plotted, data_index):
 
 
 ############################## code for testing 
-#Load data and format
-mf_interaction = pd.read_hdf('18_10_29_mf_interaction_leftDeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000.h5')
-#mf_interaction_female = pd.read_hdf('23_10_18_mf2_interaction1DeepCut_resnet50_mf_interaction_female18_10_23shuffle1_150000.h5')
-mf_interaction = mf_interaction.T
-#mf_interaction_female = mf_interaction_female.T
+if __name__ == '__main__':
 
-#Copy and paste the name of the scorer from the dataframe above (also find out how to get the infor directly from the dataframe..)
-scorer = 'DeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000'
-
-# the df has a MultiIndex format, this means that you need to use .loc function on the frame with multiple indexes
-# you cannot access the data with only the scorer as an index, or some other single index, it will not work
-mf_interaction.loc[(scorer, 'male_nose')]
-
-##### Look at raw data (see the imperfection due to failures of DLC to consistently predict correctly)
-
-male_left_ear_x_raw, male_left_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'male_left_ear')
-male_right_ear_x_raw, male_right_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'male_right_ear')
-male_nose_x_raw, male_nose_y_raw = get_x_y_data(mf_interaction, scorer, 'male_nose')
-male_tail_x_raw, male_tail_y_raw = get_x_y_data(mf_interaction, scorer, 'male_tail')
-
-female_left_ear_x_raw, female_left_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'female_left_ear')
-female_right_ear_x_raw, female_right_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'female_right_ear')
-female_nose_x_raw, female_nose_y_raw = get_x_y_data(mf_interaction, scorer, 'female_nose')
-female_tail_x_raw, female_tail_y_raw = get_x_y_data(mf_interaction, scorer, 'female_tail')
-
-plt.figure(figsize = (10,10))
-#use plotting function to plot the coords and see them combined
-plt.title('no interpolaton and no filter', size = 15)
-plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 2000, 1, 1)
-plt.tight_layout()
-
-#### Look at data after DLC predicted locations that are < a threshold_confidence are removed and interpolated over, starting by looking at only one bodypart
-
-# this will set all values where DLC gave a predicted location at less than a specified confidence interval to 0
-female_nose_0s_x, female_nose_0s_y = get_x_y_data_cleanup(mf_interaction, scorer, 'female_nose', 0.98)
-
-female_nose_0s_y
-
-# this will interpolate linearly over all co-ordinates set to 0 in the previous function '0scleanup'
-start_value_cleanup(female_nose_0s_x)
-start_value_cleanup(female_nose_0s_y)
-female_nose_interpolated_x = interp_0_coords(female_nose_0s_x)
-female_nose_interpolated_y = interp_0_coords(female_nose_0s_y)
-
-plt.figure(figsize = (15,10))
-
-#plot raw
-plt.title('no interpolaton and no filter', size = 15)
-plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 200, 2, 1)
-plt.title('0s -> lfilter', size = 15)
-plot_x_y_coords(female_nose_interpolated_x, female_nose_interpolated_y, 50, 1000, 2, 2)
-plt.title('0s -> interpolation -> lfilter', size = 15)
-plt.tight_layout()
-
-#Q: Are there more suitable filters than linear filter?
-
-#### Now can smooth over the data using linear fileter
-
-from scipy.signal import lfilter
-
-n= 20 # the larger n is, the smoother curve will be
-
-nom = [1.0 / n] * n
-denom = 1
-female_nose_interpolated_lfilt_x = lfilter(nom,denom,female_nose_interpolated_x)
-female_nose_interpolated_lfilt_y = lfilter(nom,denom,female_nose_interpolated_y)
-
-#this is data before
-female_nose_0s_lfilt_x = lfilter(nom,denom,female_nose_0s_x)
-female_nose_0s_lfilt_y = lfilter(nom,denom,female_nose_0s_y)
-
-
-#Comparing how good the home-made interpolation + lfilter is, compared to non-interpolated + filter
-
-plt.figure(figsize = (13,8))
-
-#plot unfiltered
-
-#plt.title('no interpolaton and no filter', size = 15)
-plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 1000, 3, 1)
-#plt.title('0s -> lfilter', size = 15)
-plot_x_y_coords(female_nose_0s_lfilt_x, female_nose_0s_lfilt_y, 50, 1000, 3, 2)
-#plt.title('0s -> interpolation -> lfilter', size = 15)
-plot_x_y_coords(female_nose_interpolated_lfilt_x, female_nose_interpolated_lfilt_y, 50, 1000, 3, 3)
-
-
-
-plt.tight_layout()
+    #Load data and format
+    mf_interaction = pd.read_hdf('18_10_29_mf_interaction_leftDeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000.h5')
+    #mf_interaction_female = pd.read_hdf('23_10_18_mf2_interaction1DeepCut_resnet50_mf_interaction_female18_10_23shuffle1_150000.h5')
+    mf_interaction = mf_interaction.T
+    #mf_interaction_female = mf_interaction_female.T
+    
+    #Copy and paste the name of the scorer from the dataframe above (also find out how to get the infor directly from the dataframe..)
+    scorer = 'DeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000'
+    
+    # the df has a MultiIndex format, this means that you need to use .loc function on the frame with multiple indexes
+    # you cannot access the data with only the scorer as an index, or some other single index, it will not work
+    mf_interaction.loc[(scorer, 'male_nose')]
+    
+    ##### Look at raw data (see the imperfection due to failures of DLC to consistently predict correctly)
+    
+    male_left_ear_x_raw, male_left_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'male_left_ear')
+    male_right_ear_x_raw, male_right_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'male_right_ear')
+    male_nose_x_raw, male_nose_y_raw = get_x_y_data(mf_interaction, scorer, 'male_nose')
+    male_tail_x_raw, male_tail_y_raw = get_x_y_data(mf_interaction, scorer, 'male_tail')
+    
+    female_left_ear_x_raw, female_left_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'female_left_ear')
+    female_right_ear_x_raw, female_right_ear_y_raw = get_x_y_data(mf_interaction, scorer, 'female_right_ear')
+    female_nose_x_raw, female_nose_y_raw = get_x_y_data(mf_interaction, scorer, 'female_nose')
+    female_tail_x_raw, female_tail_y_raw = get_x_y_data(mf_interaction, scorer, 'female_tail')
+    
+    plt.figure(figsize = (10,10))
+    #use plotting function to plot the coords and see them combined
+    plt.title('no interpolaton and no filter', size = 15)
+    plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 2000, 1, 1)
+    plt.tight_layout()
+    
+    #### Look at data after DLC predicted locations that are < a threshold_confidence are removed and interpolated over, starting by looking at only one bodypart
+    
+    # this will set all values where DLC gave a predicted location at less than a specified confidence interval to 0
+    female_nose_0s_x, female_nose_0s_y = get_x_y_data_cleanup(mf_interaction, scorer, 'female_nose', 0.98)
+    
+    female_nose_0s_y
+    
+    # this will interpolate linearly over all co-ordinates set to 0 in the previous function '0scleanup'
+    start_value_cleanup(female_nose_0s_x)
+    start_value_cleanup(female_nose_0s_y)
+    female_nose_interpolated_x = interp_0_coords(female_nose_0s_x)
+    female_nose_interpolated_y = interp_0_coords(female_nose_0s_y)
+    
+    plt.figure(figsize = (15,10))
+    
+    #plot raw
+    plt.title('no interpolaton and no filter', size = 15)
+    plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 200, 2, 1)
+    plt.title('0s -> lfilter', size = 15)
+    plot_x_y_coords(female_nose_interpolated_x, female_nose_interpolated_y, 50, 1000, 2, 2)
+    plt.title('0s -> interpolation -> lfilter', size = 15)
+    plt.tight_layout()
+    
+    #Q: Are there more suitable filters than linear filter?
+    
+    #### Now can smooth over the data using linear fileter
+    
+    from scipy.signal import lfilter
+    
+    n= 20 # the larger n is, the smoother curve will be
+    
+    nom = [1.0 / n] * n
+    denom = 1
+    female_nose_interpolated_lfilt_x = lfilter(nom,denom,female_nose_interpolated_x)
+    female_nose_interpolated_lfilt_y = lfilter(nom,denom,female_nose_interpolated_y)
+    
+    #this is data before
+    female_nose_0s_lfilt_x = lfilter(nom,denom,female_nose_0s_x)
+    female_nose_0s_lfilt_y = lfilter(nom,denom,female_nose_0s_y)
+    
+    
+    #Comparing how good the home-made interpolation + lfilter is, compared to non-interpolated + filter
+    
+    plt.figure(figsize = (13,8))
+    
+    #plot unfiltered
+    
+    #plt.title('no interpolaton and no filter', size = 15)
+    plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 1000, 3, 1)
+    #plt.title('0s -> lfilter', size = 15)
+    plot_x_y_coords(female_nose_0s_lfilt_x, female_nose_0s_lfilt_y, 50, 1000, 3, 2)
+    #plt.title('0s -> interpolation -> lfilter', size = 15)
+    plot_x_y_coords(female_nose_interpolated_lfilt_x, female_nose_interpolated_lfilt_y, 50, 1000, 3, 3)
+    
+    
+    
+    plt.tight_layout()
