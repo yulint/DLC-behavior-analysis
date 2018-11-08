@@ -6,7 +6,7 @@ import seaborn as sns
 from matplotlib import animation, rc
 from IPython.display import HTML
 import time
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, lfilter
 
 
 ### Clean up and interpolate coords
@@ -105,25 +105,13 @@ def apply_filter(filter_type, vec):
     if filter_type is 'linear':
         nom = [1.0 / 20] * 20
         denom = 1
-        output = lfilter(nom,denom,vec)
+        output = filtfilt(nom,denom,vec)
 
     if filter_type is 'butter':
-        b, a = butter(6, 0.1)
+        b, a = butter(6, 0.5)
         output = filtfilt(b, a, vec)
 
-    return output
-
-def plot_x_y_coords(x_coords, y_coords, start, end, n_data_plotted, data_index): 
-    
-    if end == 'end':
-        end = len(x_coords)
-    
-    plt.subplot(3,n_data_plotted,data_index)
-    plt.plot(x_coords[start:end])
-    plt.subplot(3,n_data_plotted,data_index+n_data_plotted)
-    plt.plot(y_coords[start:end])
-    plt.subplot(3,n_data_plotted,data_index+ (2*n_data_plotted))
-    plt.plot(x_coords[start:end], y_coords[start:end])
+    return vec
 
 
 ############################## code for testing 
@@ -131,11 +119,7 @@ if __name__ == '__main__':
 
     #Load data and format
     mf_interaction = pd.read_hdf('18_10_29_mf_interaction_leftDeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000.h5')
-    #mf_interaction_female = pd.read_hdf('23_10_18_mf2_interaction1DeepCut_resnet50_mf_interaction_female18_10_23shuffle1_150000.h5')
     mf_interaction = mf_interaction.T
-    #mf_interaction_female = mf_interaction_female.T
-    
-    #Copy and paste the name of the scorer from the dataframe above (also find out how to get the infor directly from the dataframe..)
     scorer = 'DeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000'
     
     # the df has a MultiIndex format, this means that you need to use .loc function on the frame with multiple indexes
@@ -174,7 +158,6 @@ if __name__ == '__main__':
     female_nose_interpolated_y = interp_0_coords(female_nose_0s_y)
     
     plt.figure(figsize = (15,10))
-    
     #plot raw
     plt.title('no interpolaton and no filter', size = 15)
     plot_x_y_coords(male_nose_x_raw, male_nose_y_raw, 50, 200, 2, 1)
@@ -186,9 +169,7 @@ if __name__ == '__main__':
     #Q: Are there more suitable filters than linear filter?
     
     #### Now can smooth over the data using linear fileter
-    
-    from scipy.signal import lfilter
-    
+        
     n= 20 # the larger n is, the smoother curve will be
     
     nom = [1.0 / n] * n
@@ -199,7 +180,6 @@ if __name__ == '__main__':
     #this is data before
     female_nose_0s_lfilt_x = lfilter(nom,denom,female_nose_0s_x)
     female_nose_0s_lfilt_y = lfilter(nom,denom,female_nose_0s_y)
-    
     
     #Comparing how good the home-made interpolation + lfilter is, compared to non-interpolated + filter
     

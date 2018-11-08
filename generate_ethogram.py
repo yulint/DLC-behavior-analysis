@@ -171,6 +171,7 @@ ax1.set_title("grappel")
 ethogram = {
         "mutual_sniffing": mutual_sniffing,
         "grappel": grappel_bool_anglefilt,
+        "sexual_pursuit": sexual_pursuit,
         "male_anogenital_sniffing": male_anogenital_sniffing,
         "male_body_sniffing": male_body_sniffing,
         "female_anogenital_sniffing": female_anogenital_sniffing,
