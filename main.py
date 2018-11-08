@@ -6,12 +6,8 @@ import seaborn as sns
 from matplotlib import animation, rc
 from IPython.display import HTML
 import time
-from scipy.signal import filtfilt, butter, lfilter
-from sklearn.manifold import TSNE
 
-from edit_data import  get_x_y_data_cleanup, start_value_cleanup, interp_0_coords
-from ethogram_analysis_code import zip_xy, find_distance, sniffing_threshold, theta_btwn_vectors, target_theta, orienting_threshold, combined_nosetail_orienting_threshold, cross_corr_xy, following_threshold, movement
-
+from edit_data import  get_x_y_data_cleanup, start_value_cleanup, interp_0_coords, apply_filter
 
 #Load data and format
 mf_interaction = pd.read_hdf('18_10_29_mf_interaction_leftDeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000.h5')
@@ -79,31 +75,31 @@ female_left_ear_interpolated_x = interp_0_coords(female_left_ear_0s_x)
 female_left_ear_interpolated_y = interp_0_coords(female_left_ear_0s_y)
 
 #### linear filter on coords 
-`
 
-female_nose_interpolated_lfilt_x = lfilter(nom,denom,female_nose_interpolated_x)
-female_nose_interpolated_lfilt_y = lfilter(nom,denom,female_nose_interpolated_y)
 
-female_tail_interpolated_lfilt_x = lfilter(nom,denom,female_tail_interpolated_x)
-female_tail_interpolated_lfilt_y = lfilter(nom,denom,female_tail_interpolated_y)
+female_nose_interpolated_lfilt_x = apply_filter( "butter", female_nose_interpolated_x)
+female_nose_interpolated_lfilt_y = apply_filter( "butter", female_nose_interpolated_y)
 
-female_right_ear_interpolated_lfilt_x = lfilter(nom,denom,female_right_ear_interpolated_x)
-female_right_ear_interpolated_lfilt_y = lfilter(nom,denom,female_right_ear_interpolated_y)
+female_tail_interpolated_lfilt_x = apply_filter( "butter", female_tail_interpolated_x)
+female_tail_interpolated_lfilt_y = apply_filter( "butter", female_tail_interpolated_y)
 
-female_left_ear_interpolated_lfilt_x = lfilter(nom,denom,female_left_ear_interpolated_x)
-female_left_ear_interpolated_lfilt_y = lfilter(nom,denom,female_left_ear_interpolated_y)
+female_right_ear_interpolated_lfilt_x = apply_filter( "butter", female_right_ear_interpolated_x)
+female_right_ear_interpolated_lfilt_y = apply_filter( "butter", female_right_ear_interpolated_y)
 
-male_nose_interpolated_lfilt_x = lfilter(nom,denom,male_nose_interpolated_x)
-male_nose_interpolated_lfilt_y = lfilter(nom,denom,male_nose_interpolated_y)
+female_left_ear_interpolated_lfilt_x = apply_filter( "butter", female_left_ear_interpolated_x)
+female_left_ear_interpolated_lfilt_y = apply_filter( "butter", female_left_ear_interpolated_y)
 
-male_tail_interpolated_lfilt_x = lfilter(nom,denom,male_tail_interpolated_x)
-male_tail_interpolated_lfilt_y = lfilter(nom,denom,male_tail_interpolated_y)
+male_nose_interpolated_lfilt_x = apply_filter( "butter", male_nose_interpolated_x)
+male_nose_interpolated_lfilt_y = apply_filter( "butter", male_nose_interpolated_y)
 
-male_right_ear_interpolated_lfilt_x = lfilter(nom,denom,male_right_ear_interpolated_x)
-male_right_ear_interpolated_lfilt_y = lfilter(nom,denom,male_right_ear_interpolated_y)
+male_tail_interpolated_lfilt_x = apply_filter( "butter", male_tail_interpolated_x)
+male_tail_interpolated_lfilt_y = apply_filter( "butter", male_tail_interpolated_y)
 
-male_left_ear_interpolated_lfilt_x = lfilter(nom,denom,male_left_ear_interpolated_x)
-male_left_ear_interpolated_lfilt_y = lfilter(nom,denom,male_left_ear_interpolated_y)
+male_right_ear_interpolated_lfilt_x = apply_filter( "butter", male_right_ear_interpolated_x)
+male_right_ear_interpolated_lfilt_y = apply_filter( "butter", male_right_ear_interpolated_y)
+
+male_left_ear_interpolated_lfilt_x = apply_filter( "butter", male_left_ear_interpolated_x)
+male_left_ear_interpolated_lfilt_y = apply_filter( "butter", male_left_ear_interpolated_y)
 
 np.save('data/female_nose_interpolated_lfilt_x', female_nose_interpolated_lfilt_x)
 np.save('data/female_nose_interpolated_lfilt_y', female_nose_interpolated_lfilt_y)

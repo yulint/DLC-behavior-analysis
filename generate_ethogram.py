@@ -9,7 +9,8 @@ from scipy.signal import lfilter
 
 from sklearn.manifold import TSNE
 
-from ethogram_analysis_code import zip_xy, find_distance, sniffing_threshold, theta_btwn_vectors, target_theta, orienting_threshold, combined_nosetail_orienting_threshold, cross_corr_xy, following_threshold, movement
+from ethogram_analysis_code import (zip_xy, find_distance, sniffing_threshold, theta_btwn_vectors, 
+target_theta, orienting_threshold, combined_nosetail_orienting_threshold, cross_corr_xy, following_threshold, movement, detect_intersect)
 
 female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
 female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
@@ -112,15 +113,16 @@ ax2.set_title("female interest")
 ######################### following: cross correlation between xy coords of male vs female
 male_cross_corr = cross_corr_xy(male_nose_xy,female_body_midpt_xy,time_bin = 35)
 female_cross_corr = cross_corr_xy(female_nose_xy,male_body_midpt_xy)
-
-male_following = following_threshold(male_cross_corr)
-female_following = following_threshold(female_cross_corr)
+print(np.mean(male_cross_corr))
+print(np.mean(female_cross_corr))
+male_following = following_threshold(male_cross_corr, threshold = 0.5)
+female_following = following_threshold(female_cross_corr, threshold = 0.5)
 
 fig, (ax1, ax2) = plt.subplots(nrows =2, figsize=(15,9))
 ax1.set_title("male following")
-ax1.plot(male_following)
+ax1.plot(male_cross_corr)
 ax2.set_title("female following")
-ax2.plot(female_following)
+ax2.plot(female_cross_corr)
 
 ########################## sexual pursuit
 
@@ -143,7 +145,49 @@ fig, ax1 = plt.subplots(figsize=(15,4))
 ax1.plot(sexual_pursuit)
 ax1.set_title("sexual_pursuit")
 
-#################################
+############################ on top of each other
+grappel_bool = []
+
+for i in range(0, len(female_nose_interpolated_lfilt_x)):
+    f_body_vector = ([female_nose_interpolated_lfilt_x[i], female_nose_interpolated_lfilt_y[i]],[female_tail_interpolated_lfilt_x[i],female_tail_interpolated_lfilt_y[i]])
+    m_body_vector = ([male_nose_interpolated_lfilt_x[i], male_nose_interpolated_lfilt_y[i]],[male_tail_interpolated_lfilt_x[i],male_tail_interpolated_lfilt_y[i]])
+    I = detect_intersect(f_body_vector, m_body_vector)
+
+    grappel_bool.append(I)
+    
+theta_output = theta_btwn_vectors((male_nose_xy-male_tail_xy), (female_nose_xy-female_tail_xy))
+theta_bool = orienting_threshold(theta_output, threshold = 1.)        
+grappel_bool_anglefilt = np.array(grappel_bool) * np.array(theta_bool)
+    
+#_, grappel = grappel_bool(female_nose_xy, female_tail_xy, male_nose_xy, male_tail_xy)
+
+fig, ax1 = plt.subplots(figsize=(15,4))
+ax1.plot(grappel_bool_anglefilt)
+ax1.set_title("grappel")
+
+
+########################## saving 
+
+ethogram = {
+        "mutual_sniffing": mutual_sniffing,
+        "grappel": grappel_bool_anglefilt,
+        "male_anogenital_sniffing": male_anogenital_sniffing,
+        "male_body_sniffing": male_body_sniffing,
+        "female_anogenital_sniffing": female_anogenital_sniffing,
+        "female_body_sniffing": female_body_sniffing,
+        "male_interest": male_interest,
+        "female_interest": female_interest,
+        "male_following": male_following,
+        "female_following": female_following,
+        "male_interest": male_interest,
+        "female_interest": female_interest
+        }
+
+with open("ethogram.pkl", "wb") as f:
+    pickle.dump(ethogram, f)
+
+
+################################# tsne/pca
 
 male_movement = np.array(male_movement)
 female_movement = np.array(female_movement)
@@ -175,7 +219,8 @@ behav_metrics = np.array([
 	male_head_to_female_nose_vector[:,1], 
 	male_head_dir_vector[:,1],
 	male_movement[:,1],
-	female_movement[:,1]
+	female_movement[:,1],
+    grappel_bool_anglefilt
 	])    
 
 # for idx, elem in enumerate(behav_metrics):
@@ -184,16 +229,28 @@ behav_metrics = np.array([
 # 	print(behav_metrics[idx].shape)
 
 behav_metrics = behav_metrics.T
-print(behav_metrics.shape)
 
-tsne = TSNE(n_components=2, perplexity=100, n_iter=1000).fit_transform(behav_metrics)
+moving_avg_window = 35 
+moving_avg_kernel = np.ones((moving_avg_window))/moving_avg_window   
+
+windowed_length =  int(behav_metrics.shape[0])-moving_avg_window+1
+behav_metrics_avg = np.zeros([windowed_length, behav_metrics.shape[1]])
+
+for i in range(behav_metrics.shape[1]):
+    behav_metrics_avg[:,i] = np.convolve(behav_metrics[:,i], moving_avg_kernel, mode = 'valid')
+
+
+print("reached tsne")
+
+tsne = TSNE(n_components=2, perplexity=100, n_iter=1000).fit_transform(behav_metrics_avg)
 plt.figure(figsize=(12,8))
 plt.title('t-SNE components')
 plt.scatter(tsne[:,0], tsne[:,1])
 plt.show()
 
+print("reached pca")
 from sklearn.decomposition import PCA
-pca = PCA(n_components=2).fit_transform(behav_metrics)
+pca = PCA(n_components=2).fit_transform(behav_metrics_avg[:1000])
 plt.title('PCA components')
 plt.scatter(pca[:,0], pca[:,1])
 plt.show()

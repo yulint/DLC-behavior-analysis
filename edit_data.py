@@ -6,6 +6,7 @@ import seaborn as sns
 from matplotlib import animation, rc
 from IPython.display import HTML
 import time
+from scipy.signal import butter, filtfilt
 
 
 ### Clean up and interpolate coords
@@ -99,11 +100,12 @@ def interp_0_coords(coords_list):
     print('function exiting')
     return(coords_list)
 
-def apply_filter(b,a,vec)
-    nom = [1.0 / 20] * 20
-    denom = 1
+def apply_filter(filter_type, vec):
+
     if filter_type is 'linear':
-        outupt = lfilter(nom,denom,vec)
+        nom = [1.0 / 20] * 20
+        denom = 1
+        output = lfilter(nom,denom,vec)
 
     if filter_type is 'butter':
         b, a = butter(6, 0.1)
