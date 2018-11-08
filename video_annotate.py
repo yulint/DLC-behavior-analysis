@@ -11,36 +11,70 @@ import pickle
 
 def load_data_dict():
     
-    data = []
     female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
     female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
-    
     female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
     female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    
     female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
     female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
-    
     female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
     female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
-    
     female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
     female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    
     male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
     male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
-    
     male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
     male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
-    
     male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
     male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
-    
     male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
     male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
-    
     male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
     male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+
+	data = [female_nose_interpolated_lfilt_x,
+	female_nose_interpolated_lfilt_y,
+	female_tail_interpolated_lfilt_x,
+	female_tail_interpolated_lfilt_y,
+	female_right_ear_interpolated_lfilt_x,
+	female_right_ear_interpolated_lfilt_y,
+	female_left_ear_interpolated_lfilt_x,
+	female_left_ear_interpolated_lfilt_y,
+	female_tail_interpolated_lfilt_x,
+	female_tail_interpolated_lfilt_y,
+	male_nose_interpolated_lfilt_x,
+	male_nose_interpolated_lfilt_y,
+	male_tail_interpolated_lfilt_x,
+	male_tail_interpolated_lfilt_y,
+	male_right_ear_interpolated_lfilt_x,
+	male_right_ear_interpolated_lfilt_y,
+	male_left_ear_interpolated_lfilt_x,
+	male_left_ear_interpolated_lfilt_y,
+	male_tail_interpolated_lfilt_x,
+	male_tail_interpolated_lfilt_y]
+
+	data_names = ['female_nose_interpolated_lfilt_x',
+	'female_nose_interpolated_lfilt_y',
+	'female_tail_interpolated_lfilt_x',
+	'female_tail_interpolated_lfilt_y',
+	'female_right_ear_interpolated_lfilt_x',
+	'female_right_ear_interpolated_lfilt_y',
+	'female_left_ear_interpolated_lfilt_x',
+	'female_left_ear_interpolated_lfilt_y',
+	'female_tail_interpolated_lfilt_x',
+	'female_tail_interpolated_lfilt_y',
+	'male_nose_interpolated_lfilt_x',
+	'male_nose_interpolated_lfilt_y',
+	'male_tail_interpolated_lfilt_x',
+	'male_tail_interpolated_lfilt_y',
+	'male_right_ear_interpolated_lfilt_x',
+	'male_right_ear_interpolated_lfilt_y',
+	'male_left_ear_interpolated_lfilt_x',
+	'male_left_ear_interpolated_lfilt_y',
+	'male_tail_interpolated_lfilt_x',
+	'male_tail_interpolated_lfilt_y'] 
+
+	return data, data_names
 
 def dict_list_to_numpy(d):
     for key in d:
@@ -59,7 +93,7 @@ def filter_binary(binary_vector, window_size):
 
 	return output
 
-def add_dots_to_video(video_file, dot_data_x, dot_data_y, color):
+def add_dots_to_video(video_file, data, data_names, color):
 
 	# assume numpy 1D data incoming 
 	cap = cv2.VideoCapture(video_file)
@@ -75,10 +109,24 @@ def add_dots_to_video(video_file, dot_data_x, dot_data_y, color):
 	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 	out = cv2.VideoWriter(os.path.splitext(video_file)[0]+'_dots.mp4', fourcc, framerate, (frame_width,frame_height))    
 
+	male_color = 'red'
+	female_color = 'blue'
+
 	for i in range(len(dot_data_x)):
 		ret, frame = cap.read()
-		cv2.circle(frame, center=[dot_data_y[i],dot_data_x[i]], radius=1) 
-		out.write(frame)
+
+		for k in range(1,2,len(data)-1): 
+
+			if data_names[i][0] is 'f':
+				color = female_color
+			else:
+				color = male_color
+
+			dot_data_x = data[k]
+			dot_data_y = data[k+1]
+
+			cv2.circle(frame, center=[dot_data_y[i],dot_data_x[i]], radius=1, color=color) 
+			out.write(frame)
 
 	cap.release()
 	out.release()
@@ -172,6 +220,8 @@ def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_
     out.release()
 
 def main():
+
+	load_data = load_data_dict
 
     video_file = "../mouse_raw.mp4"
     video_out = "../mouse_annotated_dot"
