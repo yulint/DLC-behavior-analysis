@@ -32,8 +32,8 @@ def load_data_dict():
     male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
     male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
-	data = [female_nose_interpolated_lfilt_x,
-	female_nose_interpolated_lfilt_y,
+    data = [female_nose_interpolated_lfilt_x,
+    female_nose_interpolated_lfilt_y,
 	female_tail_interpolated_lfilt_x,
 	female_tail_interpolated_lfilt_y,
 	female_right_ear_interpolated_lfilt_x,
@@ -51,9 +51,9 @@ def load_data_dict():
 	male_left_ear_interpolated_lfilt_x,
 	male_left_ear_interpolated_lfilt_y,
 	male_tail_interpolated_lfilt_x,
-	male_tail_interpolated_lfilt_y]
+    male_tail_interpolated_lfilt_y]
 
-	data_names = ['female_nose_interpolated_lfilt_x',
+    data_names = ['female_nose_interpolated_lfilt_x',
 	'female_nose_interpolated_lfilt_y',
 	'female_tail_interpolated_lfilt_x',
 	'female_tail_interpolated_lfilt_y',
@@ -72,9 +72,9 @@ def load_data_dict():
 	'male_left_ear_interpolated_lfilt_x',
 	'male_left_ear_interpolated_lfilt_y',
 	'male_tail_interpolated_lfilt_x',
-	'male_tail_interpolated_lfilt_y'] 
+    'male_tail_interpolated_lfilt_y'] 
 
-	return data, data_names
+    return data, data_names
 
 def dict_list_to_numpy(d):
     for key in d:
@@ -93,7 +93,7 @@ def filter_binary(binary_vector, window_size):
 
 	return output
 
-def add_dots_to_video(video_file, data, data_names, color):
+def add_dots_to_video(video_file, data, data_names):
 
 	# assume numpy 1D data incoming 
 	cap = cv2.VideoCapture(video_file)
@@ -109,23 +109,26 @@ def add_dots_to_video(video_file, data, data_names, color):
 	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 	out = cv2.VideoWriter(os.path.splitext(video_file)[0]+'_dots.mp4', fourcc, framerate, (frame_width,frame_height))    
 
-	male_color = 'red'
-	female_color = 'blue'
+	male_color = (255,0,0)
+	female_color = (0,0,255)
 
-	for i in range(len(dot_data_x)):
+	for i in range(len(data[0])):
 		ret, frame = cap.read()
 
 		for k in range(1,2,len(data)-1): 
 
-			if data_names[i][0] is 'f':
+			if data_names[k][0] is 'f':
 				color = female_color
 			else:
 				color = male_color
 
 			dot_data_x = data[k]
 			dot_data_y = data[k+1]
-
-			cv2.circle(frame, center=[dot_data_y[i],dot_data_x[i]], radius=1, color=color) 
+            
+			cv2.circle(frame, 
+              center=(int(round(dot_data_y[i])),int(round(dot_data_x[i]))), 
+              radius=1, 
+              color=color) 
 			out.write(frame)
 
 	cap.release()
@@ -168,6 +171,12 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type, num
 
 	cap.release()
 	out.release()
+    
+def read_video(video_file):
+    cap = cv2.VideoCapture(video_file)
+    ret, frame = cap.read()
+    if ret is not True:
+        print('not read')
 
 def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_frames):
     '''
@@ -220,24 +229,22 @@ def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_
     out.release()
 
 def main():
-
-	load_data = load_data_dict
-
-    video_file = "../mouse_raw.mp4"
-    video_out = "../mouse_annotated_dot"
-    cap = cv2.VideoCapture(video_file)
-    num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(num_frames)
     
-    with open("ethogram.pkl", "rb") as f:
-        ethogram = pickle.load(f)
-        
-    dict_list_to_numpy(ethogram)
+    data, data_names = load_data_dict()
     
-    for behaviour in ethogram.keys():
-        ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
+    video_file = "mouse_raw.mp4"
     
-    add_dots_to_video(video_file, video_out , num_frames)
+    read_video(video_file)
+    
+#    with open("ethogram.pkl", "rb") as f:
+#        ethogram = pickle.load(f)
+#        
+#    dict_list_to_numpy(ethogram)
+#    
+#    for behaviour in ethogram.keys():
+#        ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
+#    
+#    add_dots_to_video(video_file, data, data_names)
     
 if __name__ == '__main__':
 	main()
