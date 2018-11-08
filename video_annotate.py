@@ -11,26 +11,26 @@ import pickle
 
 def load_data_dict():
     
-    female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
-    female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
-    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
-    female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
-    female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
-    female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
-    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
-    male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
-    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
-    male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
-    male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
-    male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
-    male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
-    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+	female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
+	female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
+	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+	female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
+	female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
+	female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
+	female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
+	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+	male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
+	male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
+	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+	male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
+	male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
+	male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
+	male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
+	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
 	data = [female_nose_interpolated_lfilt_x,
 	female_nose_interpolated_lfilt_y,
@@ -81,16 +81,37 @@ def dict_list_to_numpy(d):
         d[key] = np.array(d[key])
 
 def filter_binary(binary_vector, window_size):
-	assert window_size > 0, "Window size must be greater than 0"
+	assert window_size > 0, "Window must be at least 1."
+	output = list(binary_vector)
+	templates = []	
+	# make templates
+	for size in range(1,window_size+1):
+		template = [1 for i in range(size+2)]
+		template[0] = 0
+		template[-1] = 0
+		templates.append(template)
+	#compare templates 
+	for template in templates:	
+		for i in range(0,len(output)-len(template)+1,1):
+			if list(binary_vector[i:i+len(template)]) == template:
+				output[i:i+len(template)] = [0 for o in template]
+	return output
 
-	num_behaviours = 0 
-	output = np.zeros_like(binary_vector)
-	for index in range(len(binary_vector) - (window_size + 1)):
-		if binary_vector[index:index+window_size].all() == 1:
-			num_behaviours += 1
-			output[index:index+window_size] = np.ones(window_size)
-	print('{} instances of behaviour found after filtering'.format(num_behaviours))
-
+def smooth_binary(binary_vector, window_size):
+	assert window_size > 0, "Window must be at least 1."
+	output = list(binary_vector)
+	templates = []	
+	# make templates
+	for size in range(1,window_size+1):
+		template = [0 for i in range(size+2)]
+		template[0] = 1
+		template[-1] = 1
+		templates.append(template)
+	#compare templates 
+	for template in templates:
+		for i in range(0,len(output)+1,1):
+			if list(binary_vector[i:i+len(template)]) == template:
+				output[i:i+len(template)] = [1 for o in template]
 	return output
 
 def add_dots_to_video(video_file, data, data_names, color):
@@ -221,23 +242,27 @@ def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_
 
 def main():
 
+	fill_max = 2
+	cut_max = 5
+	filtered_binary = filter_binary(smooth_binary(binary_vector,fill_max),cut_max)
+
 	load_data = load_data_dict
 
-    video_file = "../mouse_raw.mp4"
-    video_out = "../mouse_annotated_dot"
-    cap = cv2.VideoCapture(video_file)
-    num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(num_frames)
-    
-    with open("ethogram.pkl", "rb") as f:
-        ethogram = pickle.load(f)
-        
-    dict_list_to_numpy(ethogram)
-    
-    for behaviour in ethogram.keys():
-        ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
-    
-    add_dots_to_video(video_file, video_out , num_frames)
+	video_file = "../mouse_raw.mp4"
+	video_out = "../mouse_annotated_dot"
+	cap = cv2.VideoCapture(video_file)
+	num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+	print(num_frames)
+
+	with open("ethogram.pkl", "rb") as f:
+		ethogram = pickle.load(f)
+
+	dict_list_to_numpy(ethogram)
+
+	for behaviour in ethogram.keys():
+		ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
+
+	add_dots_to_video(video_file, video_out , num_frames)
     
 if __name__ == '__main__':
 	main()
