@@ -86,7 +86,6 @@ def dict_list_to_numpy(d):
         d[key] = np.array(d[key])
 
 def filter_binary(binary_vector, window_size):
-<<<<<<< HEAD
 	assert window_size > 0, "Window must be at least 1."
 	output = list(binary_vector)
 	templates = []	
@@ -121,9 +120,7 @@ def smooth_binary(binary_vector, window_size):
 	return output
 
 def add_dots_to_video(video_file, data, data_names, color):
-=======
     assert window_size > 0, "Window size must be greater than 0"
->>>>>>> 3b30c1ff06fab6874c8d231957d784e1f2c9423b
 
     num_behaviours = 0 
     output = np.zeros_like(binary_vector)
@@ -193,11 +190,6 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
         for k in range(0,len(data)-1,2): 
             
             color = color_dict[data_names[k]]
-            
-#            if data_names[k][0] is 'f':
-#                color = next(female_cm) #female_color
-#            else:
-#                color = next(male_cm) # male_color
 
             dot_data_x = data[k]
             dot_data_y = data[k+1]
@@ -229,8 +221,6 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
 
     cap.release()
     out.release()
-
-
 
 def main():
 
