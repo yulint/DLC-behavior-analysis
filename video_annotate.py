@@ -16,26 +16,26 @@ END_POINT =  10000 # 16718
 
 def load_data_dict():
     
-    female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
-    female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
-    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
-    female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
-    female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
-    female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
-    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-    male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
-    male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
-    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
-    male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
-    male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
-    male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
-    male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
-    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+	female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
+	female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
+	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+	female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
+	female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
+	female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
+	female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
+	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+	male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
+	male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
+	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+	male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
+	male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
+	male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
+	male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
+	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
     data = [female_nose_interpolated_lfilt_x,
     female_nose_interpolated_lfilt_y,
@@ -86,7 +86,44 @@ def dict_list_to_numpy(d):
         d[key] = np.array(d[key])
 
 def filter_binary(binary_vector, window_size):
+<<<<<<< HEAD
+	assert window_size > 0, "Window must be at least 1."
+	output = list(binary_vector)
+	templates = []	
+	# make templates
+	for size in range(1,window_size+1):
+		template = [1 for i in range(size+2)]
+		template[0] = 0
+		template[-1] = 0
+		templates.append(template)
+	#compare templates 
+	for template in templates:	
+		for i in range(0,len(output)-len(template)+1,1):
+			if list(binary_vector[i:i+len(template)]) == template:
+				output[i:i+len(template)] = [0 for o in template]
+	return output
+
+def smooth_binary(binary_vector, window_size):
+	assert window_size > 0, "Window must be at least 1."
+	output = list(binary_vector)
+	templates = []	
+	# make templates
+	for size in range(1,window_size+1):
+		template = [0 for i in range(size+2)]
+		template[0] = 1
+		template[-1] = 1
+		templates.append(template)
+	#compare templates 
+	for template in templates:
+		for i in range(0,len(output)+1,1):
+			if list(binary_vector[i:i+len(template)]) == template:
+				output[i:i+len(template)] = [1 for o in template]
+	return output
+
+def add_dots_to_video(video_file, data, data_names, color):
+=======
     assert window_size > 0, "Window size must be greater than 0"
+>>>>>>> 3b30c1ff06fab6874c8d231957d784e1f2c9423b
 
     num_behaviours = 0 
     output = np.zeros_like(binary_vector)
@@ -196,6 +233,10 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
 
 
 def main():
+
+	fill_max = 2
+	cut_max = 5
+	filtered_binary = filter_binary(smooth_binary(binary_vector,fill_max),cut_max)
     
     data, data_names = load_data_dict()
     
