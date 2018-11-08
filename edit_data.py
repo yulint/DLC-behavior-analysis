@@ -213,5 +213,4 @@ if __name__ == '__main__':
     plot_x_y_coords(female_nose_interpolated_lfilt_x, female_nose_interpolated_lfilt_y, 50, 1000, 3, 3)
     
     
-    
     plt.tight_layout()

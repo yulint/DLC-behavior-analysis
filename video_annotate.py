@@ -19,6 +19,10 @@ def filter_binary(binary_vector, window_size):
 
 	return output
 
+def add_dots_to_video(video_file, dot_data):
+	# assume hdf5 data incoming 
+	pass
+
 # add words to 
 def annotate_video(filename_in, filename_out, binary_vector, behaviour_type):
 	'''
@@ -29,9 +33,11 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type):
 	cap = cv2.VideoCapture(filename_in)
 	frame_width = int(cap.get(3))
 	frame_height = int(cap.get(4))
+	print('frame size: ',frame_width,'x',frame_height)
 	framerate = 30
 	num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-	fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+	# fourcc = cv2.VideoWriter_fourcc(*'avc1')
+	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 	out = cv2.VideoWriter(filename_out, fourcc, framerate, (frame_width,frame_height))    
 
 	for i in range(num_frames):
@@ -67,7 +73,7 @@ def main():
 	video_file = "../mouse_clip.mp4"
 	cap = cv2.VideoCapture(video_file)
 	num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-	print(num_frames)
+	print('frames:',num_frames)
 
 	# filter out lonely 1's 	
 	prob_0 = .1
