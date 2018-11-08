@@ -1,5 +1,6 @@
 import numpy as np
-
+from scipy.signal import find_peaks 
+import matplotlib.pyplot as plt 
 
 def zip_xy(x_pos, y_pos):
     
@@ -87,21 +88,36 @@ def normalised_cross_corr(a,v, mode='valid'):
 def cross_corr_xy(nose_xy, body_midpt_xy,time_bin = 35):
     num_bins = int(len(nose_xy)/time_bin)
     cross_corr_over_time = []
-
+    
     for i in range(num_bins):
         bin_start = i*time_bin
         bin_end = (i+1)*time_bin
-        bin_end_2 = (i+3)*time_bin
+        bin_end_2 = (i+2)*time_bin
 
         cross_corr_x = normalised_cross_corr(body_midpt_xy[bin_start:bin_end_2,0],nose_xy[bin_start:bin_end,0],mode='valid')
         cross_corr_y = normalised_cross_corr(body_midpt_xy[bin_start:bin_end_2,1],nose_xy[bin_start:bin_end,1],mode='valid')
-        cross_corr_xy = cross_corr_x * cross_corr_y
+        cross_corr_xy = cross_corr_x + cross_corr_y
         
-        cross_corr_over_time = np.append(cross_corr_over_time, np.full(time_bin,np.amax(cross_corr_xy)), axis=0)        
+        peak_idx, _ = find_peaks(cross_corr_xy, prominence = 0.1) 
+        
+        if len(peak_idx) == 0:
+            cross_corr_val = 0
+        if len(peak_idx) == 1:
+            cross_corr_val = cross_corr_xy[peak_idx]
+        if len(peak_idx) >1:
+            peaks = []
+            for i in peak_idx:
+                peaks.append(cross_corr_xy[i])
+            cross_corr_val = max(peaks)
+        
+#        fig, ax1= plt.subplots( figsize=(15,9))
+#        ax1.plot(cross_corr_xy)
+#        print(peak_idx)        
+        cross_corr_over_time = np.append(cross_corr_over_time, np.full(time_bin, cross_corr_val), axis=0)        
         
     return cross_corr_over_time       
 
-def following_threshold(cross_corr_over_time, threshold=0.07):
+def following_threshold(cross_corr_over_time, threshold=0.4):
     following_behaviour = []
     
     for cross_corr in cross_corr_over_time:
@@ -132,5 +148,62 @@ def movement(xy, time_scale=35):
         movement_direction.append(unit_vector)
     
     return movement_vector, movement_velocity, movement_direction
+
+
+####################################
+    
+def slope(p1, p2):
+    return (p2[1] - p1[1]) * 1. / (p2[0] - p1[0])
+   
+def y_intercept(slope, p1):
+    return p1[1] - 1. * slope * p1[0]
+   
+def intersect(line1, line2):
+    min_allowed = 1e-5   # guard against overflow
+    big_value = 1e10     # use instead (if overflow would have occurred)
+    m1 = slope(line1[0], line1[1])
+#     print( 'm1: %d' % m1 )
+    b1 = y_intercept(m1, line1[0])
+#     print( 'b1: %d' % b1 )
+    m2 = slope(line2[0], line2[1])
+#     print( 'm2: %d' % m2 )
+    b2 = y_intercept(m2, line2[0])
+#     print( 'b2: %d' % b2 )
+    if abs(m1 - m2) < min_allowed :
+        x = big_value
+    else :
+        x = (b2 - b1) / (m1 - m2)
+    y = m1 * x + b1
+#    y2 = m2 * x + b2
+#     print( '(x,y,y2) = %d,%d,%d' % (x, y, y2))
+    return (int(x),int(y))
+ 
+    
+def detect_intersect(line1, line2):
+    intersection_pt = intersect(line1, line2)
+    
+#     print(line1[0][0], line1[1][0], line2[0][0], line2[1][0], intersection_pt[0])
+#     print(line1[0][1], line1[1][1], line2[0][1], line2[1][1], intersection_pt[1])
+   
+    if (line1[0][0] < line1[1][0]) :
+        if intersection_pt[0] < line1[0][0] or intersection_pt[0] > line1[1][0]:
+#             print( 'exit 1' )
+            return 0
+    else:
+        if intersection_pt[0] > line1[0][0] or intersection_pt[0] < line1[1][0]:
+#             print( 'exit 2' )
+            return 0
+         
+    if (line2[0][0] < line2[1][0]) :
+        if intersection_pt[0] < line2[0][0] or intersection_pt[0] > line2[1][0]:  
+#             print( 'exit 3' )
+            return 0
+    else:
+        if intersection_pt[0] > line2[0][0] or intersection_pt[0] < line2[1][0]:
+#             print( 'exit 4' )
+            return 0
+    
+    return 1 
+
 
 
