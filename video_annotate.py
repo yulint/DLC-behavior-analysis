@@ -2,11 +2,50 @@
 
 import numpy as np 
 import cv2
+import os 
 import pickle
 
 # only keep long sequences of behaviours 
 # window size is minimum length of behaviour
 # behaviours lasting less will be filtered
+
+def load_data_dict():
+    
+    data = []
+    female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
+    female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
+    
+    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+    
+    female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
+    female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
+    
+    female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
+    female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
+    
+    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+    
+    male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
+    male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
+    
+    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+    
+    male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
+    male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
+    
+    male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
+    male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
+    
+    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+
+def dict_list_to_numpy(d):
+    for key in d:
+        d[key] = np.array(d[key])
+
 def filter_binary(binary_vector, window_size):
 	assert window_size > 0, "Window size must be greater than 0"
 
@@ -23,20 +62,20 @@ def filter_binary(binary_vector, window_size):
 def add_dots_to_video(video_file, dot_data_x, dot_data_y, color):
 
 	# assume numpy 1D data incoming 
-	cap = cv2.VideoCapture(filename_in)
+	cap = cv2.VideoCapture(video_file)
 	frame_width = int(cap.get(3))
 	frame_height = int(cap.get(4))
 	print('frame size: ',frame_width,'x',frame_height)
 	framerate = 30
-	num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+	#num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-	assert num_frames == len(dot_data), "video frames must be equal in length to dot frames"
+	# assert num_frames == len(dot_data_x), "video frames must be equal in length to dot frames"
 
 	# fourcc = cv2.VideoWriter_fourcc(*'avc1')
 	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 	out = cv2.VideoWriter(os.path.splitext(video_file)[0]+'_dots.mp4', fourcc, framerate, (frame_width,frame_height))    
 
-	for i in range(num_frames):
+	for i in range(len(dot_data_x)):
 		ret, frame = cap.read()
 		cv2.circle(frame, center=[dot_data_y[i],dot_data_x[i]], radius=1) 
 		out.write(frame)
@@ -94,7 +133,7 @@ def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
     out = cv2.VideoWriter(filename_out, fourcc, framerate, (frame_width,frame_height))    
 
-    for i in range(num_frames):
+    for i in range(len(binary_vector_dict.values[0])):
         ret, frame = cap.read()
         font = cv2.FONT_HERSHEY_SIMPLEX
         #bottomLeftCornerOfText = (20,20)
@@ -134,18 +173,21 @@ def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_
 
 def main():
 
-    video_file = "../mouse_clip.mp4"
+    video_file = "../mouse_raw.mp4"
+    video_out = "../mouse_annotated_dot"
     cap = cv2.VideoCapture(video_file)
     num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print(num_frames)
     
     with open("ethogram.pkl", "rb") as f:
         ethogram = pickle.load(f)
+        
+    dict_list_to_numpy(ethogram)
     
     for behaviour in ethogram.keys():
         ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
     
-    annotate_video_from_dict(video_file,"../mouse_annotated.avi",ethogram, num_frames)
+    add_dots_to_video(video_file, video_out , num_frames)
     
 if __name__ == '__main__':
 	main()
