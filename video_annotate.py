@@ -31,7 +31,8 @@ def annotate_video(filename_in, filename_out, binary_vector, behaviour_type, num
 	frame_width = int(cap.get(3))
 	frame_height = int(cap.get(4))
 	framerate = 30
-	fourcc = cv2.VideoWriter_fourcc(*"XVID")
+	num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+	fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 	out = cv2.VideoWriter(filename_out, fourcc, framerate, (frame_width,frame_height))    
 
 	for i in range(num_frames):
