@@ -71,13 +71,14 @@ female_nose_male_tail_dist  = find_distance(female_nose_xy, male_tail_xy)
 female_nose_male_body_dist  = find_distance(female_nose_xy, male_body_midpt_xy)
 
 ################### threshold distances for sniffing behaviour
-mutual_sniffing = sniffing_threshold(nose_nose_dist)
+sniff_thr = 50
+mutual_sniffing = sniffing_threshold(nose_nose_dist, threshold = sniff_thr)
 
-male_anogenital_sniffing = sniffing_threshold(male_nose_female_tail_dist)
-male_body_sniffing = sniffing_threshold(male_nose_female_body_dist)
+male_anogenital_sniffing = sniffing_threshold(male_nose_female_tail_dist, threshold = sniff_thr)
+male_body_sniffing = sniffing_threshold(male_nose_female_body_dist, threshold = sniff_thr)
 
-female_anogenital_sniffing = sniffing_threshold(female_nose_male_tail_dist)
-female_body_sniffing = sniffing_threshold(female_nose_male_body_dist)
+female_anogenital_sniffing = sniffing_threshold(female_nose_male_tail_dist, threshold = sniff_thr)
+female_body_sniffing = sniffing_threshold(female_nose_male_body_dist, threshold = sniff_thr)
 
 fig, axes = plt.subplots(nrows=3, sharex = True, figsize=(15,9))
 
@@ -190,69 +191,69 @@ with open("ethogram.pkl", "wb") as f:
 
 ################################# tsne/pca
 
-male_movement = np.array(male_movement)
-female_movement = np.array(female_movement)
-
-# only 2D lists, could be recursive for each dimension
-def pad_zeros(unpadded, shape):	
-	result = np.zeros(shape)
-	result[:unpadded.shape[0],:unpadded.shape[1]] = unpadded
-	return result
-shape = (len(nose_nose_dist),2)
-female_movement = pad_zeros(female_movement, shape)
-male_movement = pad_zeros(male_movement, shape)
-
-behav_metrics = np.array([
-	nose_nose_dist, 
-	male_nose_female_tail_dist, 
-	male_nose_female_body_dist, 
-	female_nose_male_tail_dist, 
-	female_nose_male_body_dist,
-	female_theta_to_male_nose, 
-	female_theta_to_male_tail, 
-	female_head_dir_vector[:,0],
-	female_head_dir_vector[:,1],
-	male_theta_to_female_nose, 
-	male_head_to_female_nose_vector[:,0], 
-	male_head_dir_vector[:,0],
-	male_movement[:,0],
-	female_movement[:,0],
-	male_head_to_female_nose_vector[:,1], 
-	male_head_dir_vector[:,1],
-	male_movement[:,1],
-	female_movement[:,1],
-    grappel_bool_anglefilt
-	])    
-
-# for idx, elem in enumerate(behav_metrics):
-# 	if type(elem) is not 'numpy.ndarray':
-# 		behav_metrics[idx] = np.array(elem)
-# 	print(behav_metrics[idx].shape)
-
-behav_metrics = behav_metrics.T
-
-moving_avg_window = 35 
-moving_avg_kernel = np.ones((moving_avg_window))/moving_avg_window   
-
-windowed_length =  int(behav_metrics.shape[0])-moving_avg_window+1
-behav_metrics_avg = np.zeros([windowed_length, behav_metrics.shape[1]])
-
-for i in range(behav_metrics.shape[1]):
-    behav_metrics_avg[:,i] = np.convolve(behav_metrics[:,i], moving_avg_kernel, mode = 'valid')
-
-
-print("reached tsne")
-
-tsne = TSNE(n_components=2, perplexity=100, n_iter=1000).fit_transform(behav_metrics_avg)
-plt.figure(figsize=(12,8))
-plt.title('t-SNE components')
-plt.scatter(tsne[:,0], tsne[:,1])
-plt.show()
-
-print("reached pca")
-from sklearn.decomposition import PCA
-pca = PCA(n_components=2).fit_transform(behav_metrics_avg[:1000])
-plt.title('PCA components')
-plt.scatter(pca[:,0], pca[:,1])
-plt.show()
+#male_movement = np.array(male_movement)
+#female_movement = np.array(female_movement)
+#
+## only 2D lists, could be recursive for each dimension
+#def pad_zeros(unpadded, shape):	
+#	result = np.zeros(shape)
+#	result[:unpadded.shape[0],:unpadded.shape[1]] = unpadded
+#	return result
+#shape = (len(nose_nose_dist),2)
+#female_movement = pad_zeros(female_movement, shape)
+#male_movement = pad_zeros(male_movement, shape)
+#
+#behav_metrics = np.array([
+#	nose_nose_dist, 
+#	male_nose_female_tail_dist, 
+#	male_nose_female_body_dist, 
+#	female_nose_male_tail_dist, 
+#	female_nose_male_body_dist,
+#	female_theta_to_male_nose, 
+#	female_theta_to_male_tail, 
+#	female_head_dir_vector[:,0],
+#	female_head_dir_vector[:,1],
+#	male_theta_to_female_nose, 
+#	male_head_to_female_nose_vector[:,0], 
+#	male_head_dir_vector[:,0],
+#	male_movement[:,0],
+#	female_movement[:,0],
+#	male_head_to_female_nose_vector[:,1], 
+#	male_head_dir_vector[:,1],
+#	male_movement[:,1],
+#	female_movement[:,1],
+#    grappel_bool_anglefilt
+#	])    
+#
+## for idx, elem in enumerate(behav_metrics):
+## 	if type(elem) is not 'numpy.ndarray':
+## 		behav_metrics[idx] = np.array(elem)
+## 	print(behav_metrics[idx].shape)
+#
+#behav_metrics = behav_metrics.T
+#
+#moving_avg_window = 35 
+#moving_avg_kernel = np.ones((moving_avg_window))/moving_avg_window   
+#
+#windowed_length =  int(behav_metrics.shape[0])-moving_avg_window+1
+#behav_metrics_avg = np.zeros([windowed_length, behav_metrics.shape[1]])
+#
+#for i in range(behav_metrics.shape[1]):
+#    behav_metrics_avg[:,i] = np.convolve(behav_metrics[:,i], moving_avg_kernel, mode = 'valid')
+#
+#
+#print("reached tsne")
+#
+#tsne = TSNE(n_components=2, perplexity=100, n_iter=1000).fit_transform(behav_metrics_avg)
+#plt.figure(figsize=(12,8))
+#plt.title('t-SNE components')
+#plt.scatter(tsne[:,0], tsne[:,1])
+#plt.show()
+#
+#print("reached pca")
+#from sklearn.decomposition import PCA
+#pca = PCA(n_components=2).fit_transform(behav_metrics_avg[:1000])
+#plt.title('PCA components')
+#plt.scatter(pca[:,0], pca[:,1])
+#plt.show()
 

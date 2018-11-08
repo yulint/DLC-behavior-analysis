@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import os 
 import pickle
+import matplotlib.cm as cm
 
 # only keep long sequences of behaviours 
 # window size is minimum length of behaviour
@@ -11,7 +12,7 @@ import pickle
 
 #START_POINT = 9362
 START_POINT = 9362
-END_POINT =  16718
+END_POINT =  10000 # 16718
 
 def load_data_dict():
     
@@ -97,7 +98,7 @@ def filter_binary(binary_vector, window_size):
 
     return output
 
-def add_dots_to_video(video_file, data, data_names, binary_vector_dict):
+def annotate_video(video_file, data, data_names, binary_vector_dict):
 
     # assume numpy 1D data incoming 
     cap = cv2.VideoCapture(video_file)
@@ -116,20 +117,50 @@ def add_dots_to_video(video_file, data, data_names, binary_vector_dict):
 
     male_color = (255,0,0)
     female_color = (0,0,255)
+    
+    male_cm = iter(cm.Reds_r(np.linspace(0,1,5)))
+    female_cm = iter(cm.Blues_r(np.linspace(0,1,5)))
+    color_dict = {} 
+    
     pos_dict = {}
     shift = 40
-    pos = (20,20)
+    
+    male_pos = (20,50)
+    female_pos = (int(frame_width-350),50)
+    centre_pos = (int(frame_width/2),50)
+    
     for b in binary_vector_dict.keys():
-        pos_dict[b] = pos 
-        pos = (pos[0],shift+pos[1])
-        
+        if "female" in b:
+            pos_dict[b] = female_pos 
+            female_pos = (female_pos[0],shift+female_pos[1])
+
+        elif "male" in b:
+            pos_dict[b] = male_pos 
+            male_pos = (male_pos[0],shift+male_pos[1])
+        else: 
+            pos_dict[b] = centre_pos
+            centre_pos = (centre_pos[0],shift+centre_pos[1])
+    print(pos_dict)
+
+
+    for k in range(0,len(data)-1,2): 
+        p = data_names[k]
+        if "female" in p:
+            color_dict[p] = next(female_cm)
+        elif "male" in b:
+            color_dict[p] = next(male_cm)
+    
+    
     for i in range(START_POINT,END_POINT):
         ret, frame = cap.read()
         for k in range(0,len(data)-1,2): 
-            if data_names[k][0] is 'f':
-                color = female_color
-            else:
-                color = male_color
+            
+            color = color_dict[data_names[k]]
+            
+#            if data_names[k][0] is 'f':
+#                color = next(female_cm) #female_color
+#            else:
+#                color = next(male_cm) # male_color
 
             dot_data_x = data[k]
             dot_data_y = data[k+1]
@@ -162,69 +193,13 @@ def add_dots_to_video(video_file, data, data_names, binary_vector_dict):
     cap.release()
     out.release()
 
-# add words to 
-    
-def read_video(video_file):
-    cap = cv2.VideoCapture(video_file)
-    ret, frame = cap.read()
-    print(ret)
 
-def annotate_video_from_dict(filename_in, filename_out, binary_vector_dict, num_frames):
-    '''
-    filname:: string
-    binary:: 1D numpy array 
-    '''
-    cap = cv2.VideoCapture(filename_in)
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-    framerate = 30
-    fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    out = cv2.VideoWriter(filename_out, fourcc, framerate, (frame_width,frame_height))    
-
-    for i in range(len(binary_vector_dict.values[0])):
-        ret, frame = cap.read()
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        #bottomLeftCornerOfText = (20,20)
-        fontScale = 1
-        fontColor = (255,255,255)
-        lineType = 2
-
-        for behaviour_type in binary_vector_dict:
-            binary_vector = binary_vector_dict[behaviour_type]
-            
-            male_counter = 0 
-            female_counter = 0
-            both_counter = 0
-            
-            if "male" in behaviour_type:
-                male_counter +=1
-                bottomLeftCornerOfText = (20,20) + male_counter * (0,10)
-            elif "female" in behaviour_type:
-                female_counter +=1
-                bottomLeftCornerOfText = (frame_width-50,20) + female_counter * (0,10)
-            else:
-                both_counter +=1
-                bottomLeftCornerOfText = (frame_width/2,20) + both_counter * (0,10)
-                
-            if binary_vector[i] is 1:
-                cv2.putText(frame,
-                    behaviour_type,
-                    bottomLeftCornerOfText,
-                    font,
-                    fontScale,
-                    fontColor,
-                    lineType)
-        out.write(frame)
-
-    cap.release()
-    out.release()
 
 def main():
     
     data, data_names = load_data_dict()
     
     video_file = r"C:\Users\2018_Group_a\Documents\DLC-behavior-analysis\mouse_long.avi"
-    read_video(video_file)
     
     with open("ethogram.pkl", "rb") as f:
         ethogram = pickle.load(f)
@@ -234,7 +209,7 @@ def main():
     for behaviour in ethogram.keys():
         ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
 #    
-    add_dots_to_video(video_file, data, data_names, ethogram)
+    annotate_video(video_file, data, data_names, ethogram)
     
 if __name__ == '__main__':
     main()
