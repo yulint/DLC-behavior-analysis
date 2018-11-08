@@ -9,11 +9,21 @@ import time
 
 from edit_data import  get_x_y_data_cleanup, start_value_cleanup, interp_0_coords, apply_filter
 
+def plot_x_y_coords(x_coords, y_coords, start, end, n_data_plotted, data_index): 
+    
+    if end == 'end':
+        end = len(x_coords)
+    
+    plt.subplot(3,n_data_plotted,data_index)
+    plt.plot(x_coords[start:end])
+    plt.subplot(3,n_data_plotted,data_index+n_data_plotted)
+    plt.plot(y_coords[start:end])
+    plt.subplot(3,n_data_plotted,data_index+ (2*n_data_plotted))
+    plt.plot(x_coords[start:end], y_coords[start:end])
+
 #Load data and format
 mf_interaction = pd.read_hdf('18_10_29_mf_interaction_leftDeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000.h5')
-#mf_interaction_female = pd.read_hdf('23_10_18_mf2_interaction1DeepCut_resnet50_mf_interaction_female18_10_23shuffle1_150000.h5')
 mf_interaction = mf_interaction.T
-#mf_interaction_female = mf_interaction_female.T
 
 #Copy and paste the name of the scorer from the dataframe above (also find out how to get the infor directly from the dataframe..)
 scorer = 'DeepCut_resnet50_mf_interaction_male218_10_29shuffle1_150000'
@@ -77,29 +87,29 @@ female_left_ear_interpolated_y = interp_0_coords(female_left_ear_0s_y)
 #### linear filter on coords 
 
 
-female_nose_interpolated_lfilt_x = apply_filter( "butter", female_nose_interpolated_x)
-female_nose_interpolated_lfilt_y = apply_filter( "butter", female_nose_interpolated_y)
+female_nose_interpolated_lfilt_x = apply_filter( "linear", female_nose_interpolated_x)
+female_nose_interpolated_lfilt_y = apply_filter( "linear", female_nose_interpolated_y)
 
-female_tail_interpolated_lfilt_x = apply_filter( "butter", female_tail_interpolated_x)
-female_tail_interpolated_lfilt_y = apply_filter( "butter", female_tail_interpolated_y)
+female_tail_interpolated_lfilt_x = apply_filter( "linear", female_tail_interpolated_x)
+female_tail_interpolated_lfilt_y = apply_filter( "linear", female_tail_interpolated_y)
 
-female_right_ear_interpolated_lfilt_x = apply_filter( "butter", female_right_ear_interpolated_x)
-female_right_ear_interpolated_lfilt_y = apply_filter( "butter", female_right_ear_interpolated_y)
+female_right_ear_interpolated_lfilt_x = apply_filter( "linear", female_right_ear_interpolated_x)
+female_right_ear_interpolated_lfilt_y = apply_filter( "linear", female_right_ear_interpolated_y)
 
-female_left_ear_interpolated_lfilt_x = apply_filter( "butter", female_left_ear_interpolated_x)
-female_left_ear_interpolated_lfilt_y = apply_filter( "butter", female_left_ear_interpolated_y)
+female_left_ear_interpolated_lfilt_x = apply_filter( "linear", female_left_ear_interpolated_x)
+female_left_ear_interpolated_lfilt_y = apply_filter( "linear", female_left_ear_interpolated_y)
 
-male_nose_interpolated_lfilt_x = apply_filter( "butter", male_nose_interpolated_x)
-male_nose_interpolated_lfilt_y = apply_filter( "butter", male_nose_interpolated_y)
+male_nose_interpolated_lfilt_x = apply_filter( "linear", male_nose_interpolated_x)
+male_nose_interpolated_lfilt_y = apply_filter( "linear", male_nose_interpolated_y)
 
-male_tail_interpolated_lfilt_x = apply_filter( "butter", male_tail_interpolated_x)
-male_tail_interpolated_lfilt_y = apply_filter( "butter", male_tail_interpolated_y)
+male_tail_interpolated_lfilt_x = apply_filter( "linear", male_tail_interpolated_x)
+male_tail_interpolated_lfilt_y = apply_filter( "linear", male_tail_interpolated_y)
 
-male_right_ear_interpolated_lfilt_x = apply_filter( "butter", male_right_ear_interpolated_x)
-male_right_ear_interpolated_lfilt_y = apply_filter( "butter", male_right_ear_interpolated_y)
+male_right_ear_interpolated_lfilt_x = apply_filter( "linear", male_right_ear_interpolated_x)
+male_right_ear_interpolated_lfilt_y = apply_filter( "linear", male_right_ear_interpolated_y)
 
-male_left_ear_interpolated_lfilt_x = apply_filter( "butter", male_left_ear_interpolated_x)
-male_left_ear_interpolated_lfilt_y = apply_filter( "butter", male_left_ear_interpolated_y)
+male_left_ear_interpolated_lfilt_x = apply_filter( "linear", male_left_ear_interpolated_x)
+male_left_ear_interpolated_lfilt_y = apply_filter( "linear", male_left_ear_interpolated_y)
 
 np.save('data/female_nose_interpolated_lfilt_x', female_nose_interpolated_lfilt_x)
 np.save('data/female_nose_interpolated_lfilt_y', female_nose_interpolated_lfilt_y)
