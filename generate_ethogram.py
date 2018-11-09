@@ -62,6 +62,13 @@ male_left_ear_xy = zip_xy(male_left_ear_interpolated_lfilt_x,male_left_ear_inter
 
 male_body_midpt_xy = (male_nose_xy + male_tail_xy)/2
 
+
+female_head_xy = (female_nose_xy + female_right_ear_xy + female_left_ear_xy)/3
+female_body_midpt_xy = (female_head_xy + female_tail_xy)/2
+
+male_head_xy = (male_nose_xy + male_right_ear_xy + male_left_ear_xy)/3
+male_body_midpt_xy = (male_head_xy + male_tail_xy)/2
+
 ################### calculate distances between points ####
 nose_nose_dist = find_distance(male_nose_xy, female_nose_xy)
 male_nose_female_tail_dist  = find_distance(male_nose_xy, female_tail_xy)
@@ -101,9 +108,15 @@ female_theta_to_male_tail, female_head_to_male_tail_vector, _ = target_theta(fem
 male_theta_to_female_nose, male_head_to_female_nose_vector, male_head_dir_vector = target_theta(male_nose_xy, male_left_ear_xy, male_right_ear_xy, female_nose_xy)
 male_theta_to_female_tail, male_head_to_female_tail_vector, _ = target_theta(male_nose_xy, male_left_ear_xy, male_right_ear_xy, female_tail_xy)
 
+male_theta_to_female_body, _ , _ = target_theta(male_nose_xy, male_left_ear_xy, male_right_ear_xy, female_body_midpt_xy)
+female_theta_to_male_body, _ , _ = target_theta(female_nose_xy, female_left_ear_xy, female_right_ear_xy, male_body_midpt_xy)
+
 ###threshold angles for -> nose and tail, and combine by addition
-female_interest,_ ,_ = combined_nosetail_orienting_threshold(female_theta_to_male_nose, female_theta_to_male_tail)
-male_interest, _, _ = combined_nosetail_orienting_threshold(male_theta_to_female_nose, male_theta_to_female_tail)
+female_interest,_ ,_ = combined_nosetail_orienting_threshold(female_theta_to_male_nose, female_theta_to_male_tail,threshold = np.pi/18)
+male_interest, _, _ = combined_nosetail_orienting_threshold(male_theta_to_female_nose, male_theta_to_female_tail,threshold = np.pi/18)
+
+male_interest = orienting_threshold(male_theta_to_female_body, threshold = np.pi/18)
+female_interest = orienting_threshold(female_theta_to_male_body, threshold = np.pi/18)
 
 fig, (ax1, ax2) = plt.subplots(nrows =2, figsize=(15,9))
 ax1.plot(male_interest)

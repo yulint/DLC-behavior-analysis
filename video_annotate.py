@@ -5,6 +5,7 @@ import cv2
 import os 
 import pickle
 import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 
 # only keep long sequences of behaviours 
 # window size is minimum length of behaviour
@@ -12,30 +13,30 @@ import matplotlib.cm as cm
 
 #START_POINT = 9362
 START_POINT = 9362
-END_POINT =  10000 # 16718
+END_POINT =  16718
 
 def load_data_dict():
     
-	female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
-	female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
-	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-	female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
-	female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
-	female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
-	female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
-	female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
-	female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
-	male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
-	male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
-	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
-	male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
-	male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
-	male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
-	male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
-	male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
-	male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+    female_nose_interpolated_lfilt_x = np.load('data/female_nose_interpolated_lfilt_x.npy')
+    female_nose_interpolated_lfilt_y = np.load('data/female_nose_interpolated_lfilt_y.npy')
+    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+    female_right_ear_interpolated_lfilt_x = np.load('data/female_right_ear_interpolated_lfilt_x.npy')
+    female_right_ear_interpolated_lfilt_y = np.load('data/female_right_ear_interpolated_lfilt_y.npy')
+    female_left_ear_interpolated_lfilt_x = np.load('data/female_left_ear_interpolated_lfilt_x.npy')
+    female_left_ear_interpolated_lfilt_y = np.load('data/female_left_ear_interpolated_lfilt_y.npy')
+    female_tail_interpolated_lfilt_x = np.load('data/female_tail_interpolated_lfilt_x.npy')
+    female_tail_interpolated_lfilt_y = np.load('data/female_tail_interpolated_lfilt_y.npy')
+    male_nose_interpolated_lfilt_x = np.load('data/male_nose_interpolated_lfilt_x.npy')
+    male_nose_interpolated_lfilt_y = np.load('data/male_nose_interpolated_lfilt_y.npy')
+    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
+    male_right_ear_interpolated_lfilt_x = np.load('data/male_right_ear_interpolated_lfilt_x.npy')
+    male_right_ear_interpolated_lfilt_y= np.load('data/male_right_ear_interpolated_lfilt_y.npy')
+    male_left_ear_interpolated_lfilt_x = np.load('data/male_left_ear_interpolated_lfilt_x.npy')
+    male_left_ear_interpolated_lfilt_y = np.load('data/male_left_ear_interpolated_lfilt_y.npy')
+    male_tail_interpolated_lfilt_x = np.load('data/male_tail_interpolated_lfilt_x.npy')
+    male_tail_interpolated_lfilt_y = np.load('data/male_tail_interpolated_lfilt_y.npy')
 
     data = [female_nose_interpolated_lfilt_x,
     female_nose_interpolated_lfilt_y,
@@ -119,19 +120,6 @@ def smooth_binary(binary_vector, window_size):
 				output[i:i+len(template)] = [1 for o in template]
 	return output
 
-def add_dots_to_video(video_file, data, data_names, color):
-    assert window_size > 0, "Window size must be greater than 0"
-
-    num_behaviours = 0 
-    output = np.zeros_like(binary_vector)
-    for index in range(len(binary_vector) - (window_size + 1)):
-        if binary_vector[index:index+window_size].all() == 1:
-            num_behaviours += 1
-            output[index:index+window_size] = np.ones(window_size)
-    print('{} instances of behaviour found after filtering'.format(num_behaviours))
-
-    return output
-
 def annotate_video(video_file, data, data_names, binary_vector_dict):
 
     # assume numpy 1D data incoming 
@@ -151,11 +139,7 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
 
     male_color = (255,0,0)
     female_color = (0,0,255)
-    
-    male_cm = iter(cm.Reds_r(np.linspace(0,1,5)))
-    female_cm = iter(cm.Blues_r(np.linspace(0,1,5)))
-    color_dict = {} 
-    
+
     pos_dict = {}
     shift = 40
     
@@ -175,21 +159,15 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
             pos_dict[b] = centre_pos
             centre_pos = (centre_pos[0],shift+centre_pos[1])
     print(pos_dict)
-
-
-    for k in range(0,len(data)-1,2): 
-        p = data_names[k]
-        if "female" in p:
-            color_dict[p] = next(female_cm)
-        elif "male" in b:
-            color_dict[p] = next(male_cm)
-    
     
     for i in range(START_POINT,END_POINT):
         ret, frame = cap.read()
         for k in range(0,len(data)-1,2): 
             
-            color = color_dict[data_names[k]]
+            if data_names[k][0] is 'f':
+                color = female_color
+            else:
+                color =  male_color
 
             dot_data_x = data[k]
             dot_data_y = data[k+1]
@@ -222,11 +200,17 @@ def annotate_video(video_file, data, data_names, binary_vector_dict):
     cap.release()
     out.release()
 
+def remove_twos(vec):
+    output = vec[:]
+    for i in range(len(vec)):
+        if output[i] == 2:
+            output[i] = 1
+    return output
+
 def main():
 
-	fill_max = 2
-	cut_max = 5
-	filtered_binary = filter_binary(smooth_binary(binary_vector,fill_max),cut_max)
+    fill_max = 60
+    cut_max = 30
     
     data, data_names = load_data_dict()
     
@@ -237,9 +221,19 @@ def main():
         
     dict_list_to_numpy(ethogram)
     
+    
     for behaviour in ethogram.keys():
-        ethogram[behaviour] = filter_binary(ethogram[behaviour], 13)
-#    
+        output = remove_twos(ethogram[behaviour])
+        fig, ax = plt.subplots(figsize=(12,5))
+        ax.set_title(behaviour)
+        ax.plot(output[START_POINT:END_POINT], color = 'black')
+        
+        fig, ax = plt.subplots(figsize=(12,5))
+        output = filter_binary(smooth_binary(output,fill_max),cut_max)
+        ax.plot(output[START_POINT:END_POINT], color = 'red')      
+        
+        ethogram[behaviour] = output
+    
     annotate_video(video_file, data, data_names, ethogram)
     
 if __name__ == '__main__':
